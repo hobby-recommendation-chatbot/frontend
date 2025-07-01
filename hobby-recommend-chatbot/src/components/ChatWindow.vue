@@ -253,6 +253,7 @@ onMounted(async () => {
   font-size: 0.75rem;
   opacity: 0.7;
   min-width: 20px; /* 시간 텍스트가 잘리지 않도록 최소 너비 지정 */
+  color : white
 }
 
 .user-message .message-time {
@@ -344,9 +345,10 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
+
 .send-button {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, #8B5CF6, #A855F7);
   border: none;
@@ -357,6 +359,13 @@ onMounted(async () => {
   justify-content: center;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.send-button svg {
+  width: 22px !important; /* 원하는 크기로 설정 */
+  height: 22px !important;/* 원하는 크기로 설정 */
+  display: block; /* SVG가 블록 레벨 요소처럼 동작하도록 하여 레이아웃 문제 방지 */
+  flex-shrink: 0;
 }
 
 .send-button:hover:not(:disabled) {
