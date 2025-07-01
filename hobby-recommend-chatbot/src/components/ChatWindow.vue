@@ -47,6 +47,7 @@
           placeholder="답변을 입력해주세요..."
           class="chat-input"
           :disabled="isTyping || waitingForAI"
+          ref="chatInputRef"
         />
         <button 
           @click="sendMessage"
@@ -79,6 +80,7 @@ const isTyping = ref(false);
 const waitingForAI = ref(false);
 const currentQuestionIndex = ref(0);
 const isComplete = ref(false);
+const chatInputRef = ref<HTMLInputElement | null>(null); // 이 줄을 추가
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -88,10 +90,10 @@ const scrollToBottom = async () => {
 };
 
 const formatTime = (date: Date) => {
-  return date.toLocaleTimeString('ko-KR', { 
-    hour: '2-digit', 
+  return date.toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
     minute: '2-digit',
-    hour12: false 
+    hour12: false
   });
 };
 
@@ -112,24 +114,24 @@ const handleInput = () => {
 
 const sendMessage = async () => {
   if (!userInput.value.trim() || isTyping.value || waitingForAI.value) return;
-  
+
   const messageText = userInput.value.trim();
   userInput.value = '';
-  
+
   // 사용자 메시지 추가
   addMessage(messageText, true);
-  
+
   waitingForAI.value = true;
   await new Promise(resolve => setTimeout(resolve, 800));
-  
+
   // AI 타이핑 시작
   isTyping.value = true;
   await new Promise(resolve => setTimeout(resolve, 1500));
   isTyping.value = false;
   waitingForAI.value = false;
-  
+
   currentQuestionIndex.value++;
-  
+
   if (currentQuestionIndex.value < chatResponses.length) {
     // 다음 질문
     const nextQuestion = chatResponses[currentQuestionIndex.value];
@@ -138,17 +140,28 @@ const sendMessage = async () => {
     // 모든 질문 완료
     addMessage(finalMessage, false);
     isComplete.value = true;
-    
+
     await new Promise(resolve => setTimeout(resolve, 2000));
     emit('showRecommendations');
+  }
+
+  // AI 답변 후 입력 필드에 자동으로 포커스
+  await nextTick();
+  if (chatInputRef.value && !isComplete.value) { // 대화가 완료되지 않았을 때만 포커스
+    chatInputRef.value.focus();
   }
 };
 
 onMounted(async () => {
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   const firstQuestion = chatResponses[0];
   addMessage(firstQuestion.question, false);
+
+  await nextTick(); // 초기 메시지 로드 후 포커스 설정
+  if (chatInputRef.value) {
+    chatInputRef.value.focus();
+  }
 });
 </script>
 

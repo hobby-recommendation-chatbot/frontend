@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import ChatWindow from './components/ChatWindow.vue';
 import RecommendationModal from './components/RecommendationModal.vue';
-import HobbyDetail from './components/HobbyDetail.vue';
+import HobbyDetail from './components/HobbyDetail/HobbyDetail.vue';
 import type { AppState, Hobby } from './types';
 
 const currentState = ref<AppState>('chat');
