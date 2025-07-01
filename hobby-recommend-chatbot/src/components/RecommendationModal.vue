@@ -23,16 +23,9 @@
           <div class="card-content">
             <div class="card-header">
               <h3>{{ hobby.name }}</h3>
-              <span class="difficulty-badge" :class="getDifficultyClass(hobby.difficulty)">
-                {{ hobby.difficulty }}
-              </span>
             </div>
             
             <p class="description">{{ hobby.description }}</p>
-            
-            <div class="card-meta">
-              <span class="category">📂 {{ hobby.category }}</span>
-            </div>
             
             <button 
               @click="selectHobby(hobby)"
@@ -69,14 +62,6 @@ const selectHobby = (hobby: Hobby) => {
   emit('selectHobby', hobby);
 };
 
-const getDifficultyClass = (difficulty: string) => {
-  switch(difficulty) {
-    case '초급': return 'beginner';
-    case '중급': return 'intermediate';
-    case '고급': return 'advanced';
-    default: return 'beginner';
-  }
-};
 
 const updateActiveCard = () => {
   if (!scrollContainer.value) return;
@@ -268,29 +253,6 @@ onUnmounted(() => {
   flex: 1;
 }
 
-.difficulty-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-left: 0.75rem;
-}
-
-.difficulty-badge.beginner {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.difficulty-badge.intermediate {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.difficulty-badge.advanced {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
 .description {
   color: #4b5563;
   font-size: 0.875rem;
@@ -300,14 +262,6 @@ onUnmounted(() => {
 
 .card-meta {
   margin-bottom: 1rem;
-}
-
-.category {
-  color: #6b7280;
-  font-size: 0.75rem;
-  background: #f9fafb;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.5rem;
 }
 
 .select-button {

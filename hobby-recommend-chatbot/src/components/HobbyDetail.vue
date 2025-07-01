@@ -6,10 +6,6 @@
       </button>
       <h1>{{ hobby.name }}</h1>
       <div class="header-meta">
-        <span class="category-tag">{{ hobby.category }}</span>
-        <span class="difficulty-tag" :class="getDifficultyClass(hobby.difficulty)">
-          {{ hobby.difficulty }}
-        </span>
       </div>
     </div>
 
@@ -40,24 +36,7 @@
             <h3>📖 상세 설명</h3>
             <p>{{ hobby.description }}</p>
           </div>
-          
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">📂</div>
-              <div class="stat-content">
-                <span class="stat-label">카테고리</span>
-                <span class="stat-value">{{ hobby.category }}</span>
-              </div>
-            </div>
-            
-            <div class="stat-card">
-              <div class="stat-icon">⭐</div>
-              <div class="stat-content">
-                <span class="stat-label">난이도</span>
-                <span class="stat-value">{{ hobby.difficulty }}</span>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
 
