@@ -267,7 +267,7 @@ onMounted(async () => {
 
 .typing-indicator {
   position: absolute;
-  bottom: 80px;
+  bottom: 98px;
   left: 1rem;
   right: 1rem;
   padding: 1rem;
