@@ -21,9 +21,9 @@
           <div class="message-content">
             {{ message.content }}
           </div>
-          <div class="message-time">
-            {{ formatTime(message.timestamp) }}
-          </div>
+        </div>
+        <div class="message-time">
+          {{ formatTime(message.timestamp) }}
         </div>
       </div>
     </div>
@@ -157,7 +157,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
 }
 
@@ -174,7 +174,7 @@ onMounted(async () => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8B5CF6, #A855F7);
+  background: linear-gradient(135deg, #97a9cd, #a55bea);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,15 +207,19 @@ onMounted(async () => {
 }
 
 .message-wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; /* 메시지 버블과 시간 사이의 간격 확보 */
   display: flex;
+  align-items: flex-end; /* 메시지 버블과 시간을 하단 정렬 */
+  gap: 0.5rem; /* 메시지 버블과 시간 사이의 간격 */
 }
 
 .user-message {
-  justify-content: flex-end;
+  flex-direction: row-reverse; /* 사용자 메시지일 경우 순서 반대로 (말풍선 오른쪽, 시간 왼쪽) */
+  justify-content: flex-start; /* flex-end 대신 flex-start를 사용하여 전체 묶음이 오른쪽으로 가도록 함 */
 }
 
 .ai-message {
+  flex-direction: row; /* AI 메시지일 경우 순서대로 (말풍선 왼쪽, 시간 오른쪽) */
   justify-content: flex-start;
 }
 
@@ -225,7 +229,7 @@ onMounted(async () => {
 }
 
 .user-message .message {
-  background: rgba(107, 114, 128, 0.9);
+  background: rgba(155, 146, 160, 0.9);
   color: white;
   padding: 0.875rem 1rem;
   border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
@@ -233,7 +237,7 @@ onMounted(async () => {
 }
 
 .ai-message .message {
-  background: rgba(139, 92, 246, 0.9);
+  background: rgba(199, 175, 255, 0.9);
   color: white;
   padding: 0.875rem 1rem;
   border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
@@ -242,15 +246,23 @@ onMounted(async () => {
 
 .message-content {
   line-height: 1.5;
-  margin-bottom: 0.25rem;
   white-space: pre-line;
 }
 
 .message-time {
   font-size: 0.75rem;
   opacity: 0.7;
-  text-align: right;
+  min-width: 20px; /* 시간 텍스트가 잘리지 않도록 최소 너비 지정 */
 }
+
+.user-message .message-time {
+  text-align: left; /* 사용자 메시지의 시간은 왼쪽에 정렬 */
+}
+
+.ai-message .message-time {
+  text-align: right; /* AI 메시지의 시간은 오른쪽에 정렬 */
+}
+
 
 .typing-indicator {
   position: absolute;
