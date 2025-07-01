@@ -178,6 +178,7 @@ onUnmounted(() => {
   cursor: pointer;
   width: 32px;
   height: 32px;
+  padding: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
