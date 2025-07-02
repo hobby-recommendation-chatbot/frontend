@@ -68,6 +68,9 @@
 import { ref, nextTick, onMounted } from 'vue';
 import type { Message } from '../types';
 import { chatResponses, finalMessage } from '../data/chatResponses';
+import axios from 'axios'
+
+const token = 'hBd0Wc4ssJoIWfNOBkoK'
 
 const emit = defineEmits<{
   showRecommendations: []
@@ -118,17 +121,43 @@ const sendMessage = async () => {
   const messageText = userInput.value.trim();
   userInput.value = '';
 
-  // 사용자 메시지 추가
-  addMessage(messageText, true);
+// 사용자 메시지 추가
+addMessage(messageText, true);
 
-  waitingForAI.value = true;
-  await new Promise(resolve => setTimeout(resolve, 800));
+// AI 타이핑 표시
+waitingForAI.value = true;
+isTyping.value = true;
 
-  // AI 타이핑 시작
-  isTyping.value = true;
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  isTyping.value = false;
+try {
+  const res = await axios.post('http://localhost:8000/chat', {
+    token,
+    message: messageText,
+  });
+
+  const answer = res.data.data.answer;
+
+  addMessage(answer, false);
+
+  // 완료 여부 확인 (예: 마지막 메시지인 경우 showRecommendations 호출)
+  if (answer.includes('추천을 드릴게요') || answer.includes('완료')) {
+    isComplete.value = true;
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    emit('showRecommendations');
+  }
+
+} catch (error) {
+  addMessage('서버 오류가 발생했습니다. 다시 시도해주세요.', false);
+  console.error(error);
+} finally {
   waitingForAI.value = false;
+  isTyping.value = false;
+
+  await nextTick();
+  if (chatInputRef.value && !isComplete.value) {
+    chatInputRef.value.focus();
+  }
+}
+
 
   currentQuestionIndex.value++;
 
