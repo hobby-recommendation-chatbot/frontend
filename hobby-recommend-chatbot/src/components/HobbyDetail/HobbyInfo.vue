@@ -7,11 +7,11 @@
       </div>
     </div>
     
+    <div class="description-card">
+      <h3>📖 상세 설명</h3>
+      <p>추천된 취미에 대한 특징을 확인해보세요.</p>
+    </div>
     <div class="info-content">
-      <div class="description-card">
-        <h3>📖 상세 설명</h3>
-        <p>{{ hobby.description }}</p>
-      </div>
     </div>
   </div>
 </template>
@@ -26,6 +26,7 @@ defineProps<{
 
 <style scoped>
 .info-panel {
+  padding: 1.5rem;
   padding-bottom: 2rem;
   animation: fadeIn 0.3s ease-out;
 }
@@ -73,7 +74,7 @@ defineProps<{
 .description-card h3 {
   margin: 0 0 1rem 0;
   color: #1f2937;
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
