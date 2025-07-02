@@ -70,7 +70,7 @@ import type { Message } from '../types';
 import { chatResponses, finalMessage } from '../data/chatResponses';
 import axios from 'axios'
 
-const token = 'hBd0Wc4ssJoIWfNOBkoK'
+const token = ref('');
 
 const emit = defineEmits<{
   showRecommendations: []
@@ -130,13 +130,14 @@ isTyping.value = true;
 
 try {
   const res = await axios.post('http://localhost:8000/chat', {
-    token,
+    token: token.value,
     message: messageText,
   });
 
-  const answer = res.data.data.answer;
+  const answer = res.data.data.message;
+  // console.log(answer)
 
-  addMessage(answer, false);
+  addMessage(answer, false)
 
   // 완료 여부 확인 (예: 마지막 메시지인 경우 showRecommendations 호출)
   if (answer.includes('추천을 드릴게요') || answer.includes('완료')) {
@@ -182,14 +183,22 @@ try {
 };
 
 onMounted(async () => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  try {
+    const res = await axios.get('http://localhost:8000/generate-token');
+    token.value = res.data.data.token;
 
-  const firstQuestion = chatResponses[0];
-  addMessage(firstQuestion.question, false);
+    // 첫 질문 표시
+    const firstQuestion = chatResponses[0];
+    addMessage(firstQuestion.question, false);
+    // console.log(token.value)
 
-  await nextTick(); // 초기 메시지 로드 후 포커스 설정
-  if (chatInputRef.value) {
-    chatInputRef.value.focus();
+    await nextTick(); // 초기 메시지 로드 후 포커스 설정
+    if (chatInputRef.value) {
+      chatInputRef.value.focus();
+    }
+  } catch (error) {
+    console.error("토큰 생성 실패:", error);
+    addMessage('서버 오류로 대화를 시작할 수 없습니다.', false);
   }
 });
 </script>
