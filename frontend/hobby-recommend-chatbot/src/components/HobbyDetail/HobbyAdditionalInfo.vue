@@ -8,7 +8,7 @@
     <div class="additional-content">
       <div class="content-card">
         <h4>🎯 시작하기 전에</h4>
-        <p>{{ hobby.additionalInfo }}</p>
+        <p>{{ hobby.additional_info || '추가 정보가 제공되지 않았습니다.' }}</p>
       </div>
     </div>
   </div>

@@ -1,16 +1,34 @@
 <template>
   <div class="info-panel">
     <div class="hero-image">
-      <img :src="hobby.image" :alt="hobby.name" />
+      <!-- 이미지가 없는 경우 기본 아이콘 표시 -->
+      <div class="image-placeholder" v-if="!hobby.image_url">
+        <div class="hobby-icon">🎯</div>
+      </div>
+      <img v-else :src="hobby.image_url" :alt="hobby.name" />
       <div class="image-overlay">
         <h2>{{ hobby.name }}</h2>
+        <span class="eng-name" v-if="hobby.eng_name">({{ hobby.eng_name }})</span>
       </div>
     </div>
     
     <div class="info-content">
-      <div class="description-card">
-        <h3>📖 상세 설명</h3>
-        <p>{{ hobby.description }}</p>
+      <!-- 기본 설명 섹션 -->
+      <div class="description-card" v-if="hobby.desc">
+        <h3>📖 기본 설명</h3>
+        <p>{{ hobby.desc }}</p>
+      </div>
+      
+      <!-- 상세 설명 섹션 -->
+      <div class="description-card" v-if="hobby.detail">
+        <h3>📋 상세 정보</h3>
+        <p>{{ hobby.detail }}</p>
+      </div>
+      
+      <!-- 설명이 없는 경우 -->
+      <div class="description-card" v-if="!hobby.desc && !hobby.detail">
+        <h3>📖 설명</h3>
+        <p>상세 정보가 제공되지 않았습니다.</p>
       </div>
     </div>
   </div>

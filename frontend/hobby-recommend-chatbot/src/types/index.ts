@@ -6,15 +6,13 @@ export interface Message {
 }
 
 export interface Hobby {
-  id: string;
   name: string;
-  description: string;
-  image: string;
-  category: string;
-  difficulty: string;
-  materials: string[];
-  additionalInfo: string;
-  tips: string[];
+  eng_name?: string;
+  desc?: string;
+  detail?: string;
+  equipments?: string | string[];
+  additional_info?: string;
+  image_url : string;
 }
 
 export type AppState = 'chat' | 'recommendations' | 'detail';

@@ -5,9 +5,9 @@
       <p>시작하기 위해 필요한 기본 도구들을 준비해보세요</p>
     </div>
     
-    <div class="materials-list">
+    <div class="materials-list" v-if="materialsList && materialsList.length > 0">
       <div 
-        v-for="(material, index) in hobby.materials" 
+        v-for="(material, index) in materialsList"
         :key="index"
         class="material-item"
       >
@@ -15,15 +15,43 @@
         <span>{{ material }}</span>
       </div>
     </div>
+    
+    <!-- 준비물 정보가 없는 경우 -->
+    <div class="no-materials" v-else>
+      <div class="no-materials-icon">📦</div>
+      <p>준비물 정보가 제공되지 않았습니다.</p>
+      <p class="sub-text">일반적으로 이 취미는 특별한 준비물이 필요하지 않거나, 가정에서 쉽게 구할 수 있는 도구들로 시작할 수 있습니다.</p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Hobby } from '../../types';
 
-defineProps<{
+const props = defineProps<{
   hobby: Hobby;
 }>();
+
+// equipments가 문자열인 경우 배열로 변환
+const materialsList = computed(() => {
+  if (!props.hobby.equipments) return [];
+  
+  // 문자열인 경우 쉼표나 줄바꿈으로 분리
+  if (typeof props.hobby.equipments === 'string') {
+    return props.hobby.equipments
+      .split(/[,\n]/)
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+  }
+  
+  // 이미 배열인 경우
+  if (Array.isArray(props.hobby.equipments)) {
+    return props.hobby.equipments;
+  }
+  
+  return [];
+});
 </script>
 
 <style scoped>

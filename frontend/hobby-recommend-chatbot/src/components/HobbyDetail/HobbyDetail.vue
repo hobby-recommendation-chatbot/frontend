@@ -45,7 +45,6 @@ import HobbyInfo from './HobbyInfo.vue';
 import HobbyMaterials from './HobbyMaterials.vue';
 import HobbyAdditionalInfo from './HobbyAdditionalInfo.vue';
 
-// props 정의 - 하지만 변수로 할당하지 않음
 defineProps<{
   hobby: Hobby;
 }>();

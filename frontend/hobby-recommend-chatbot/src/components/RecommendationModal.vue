@@ -9,25 +9,38 @@
       
       <div class="recommendations-scroll" ref="scrollContainer">
         <div 
-          v-for="(hobby, index) in hobbies" 
-          :key="hobby.id"
+          v-for="(hobby, index) in hobbies"
+          :key="index"
           class="recommendation-card"
           :class="{ 'active': index === activeIndex }"
           :ref="(el: any) => setCardRef(el, index)"
         >
           <div class="card-image">
-            <img :src="hobby.image" :alt="hobby.name" />
+            <!-- 이미지가 있는 경우 -->
+            <img 
+              v-if="hobby.image_url" 
+              :src="hobby.image_url" 
+              :alt="hobby.name" 
+            />
+            <!-- 이미지가 없는 경우 기본 아이콘 -->
+            <div v-else class="image-placeholder">
+              <div class="hobby-icon">🎯</div>
+            </div>
             <div class="card-overlay"></div>
           </div>
           
           <div class="card-content">
             <div class="card-header">
               <h3>{{ hobby.name }}</h3>
+              <span v-if="hobby.eng_name" class="eng-name">({{ hobby.eng_name }})</span>
             </div>
             
-            <p class="description">{{ hobby.description }}</p>
+            <!-- 설명 우선순위: desc > detail > 기본 메시지 -->
+            <p class="description">
+              {{ hobby.desc || hobby.detail || '이 취미에 대한 새로운 경험을 시작해보세요!' }}
+            </p>
             
-            <button 
+            <button
               @click="selectHobby(hobby)"
               class="select-button"
             >
@@ -36,6 +49,13 @@
           </div>
         </div>
       </div>
+      
+      <!-- 추천 결과가 없는 경우 -->
+      <div v-if="!hobbies || hobbies.length === 0" class="no-recommendations">
+        <div class="no-recommendations-icon">🤔</div>
+        <h3>추천할 취미를 찾고 있어요</h3>
+        <p>잠시만 기다려주세요...</p>
+      </div>
     </div>
   </div>
 </template>
@@ -43,7 +63,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import type { Hobby } from '../types';
-import { hobbies } from '../data/hobbies';
+
+// Props 정의 - 백엔드에서 받아온 취미 목록
+const props = defineProps<{
+  hobbies: Hobby[];
+}>();
 
 const emit = defineEmits<{
   close: [];
