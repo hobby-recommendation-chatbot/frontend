@@ -67,7 +67,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue';
 import type { Message } from '../types';
-import { chatResponses, finalMessage } from '../data/chatResponses';
 import axios from 'axios'
 
 const token = ref('');
@@ -81,9 +80,8 @@ const messagesContainer = ref<HTMLElement>();
 const userInput = ref('');
 const isTyping = ref(false);
 const waitingForAI = ref(false);
-const currentQuestionIndex = ref(0);
 const isComplete = ref(false);
-const chatInputRef = ref<HTMLInputElement | null>(null); // 이 줄을 추가
+const chatInputRef = ref<HTMLInputElement | null>(null);
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -121,85 +119,76 @@ const sendMessage = async () => {
   const messageText = userInput.value.trim();
   userInput.value = '';
 
-// 사용자 메시지 추가
-addMessage(messageText, true);
+  // 사용자 메시지 추가
+  addMessage(messageText, true);
 
-// AI 타이핑 표시
-waitingForAI.value = true;
-isTyping.value = true;
+  // AI 타이핑 표시
+  waitingForAI.value = true;
+  isTyping.value = true;
 
-try {
-  const res = await axios.post('http://localhost:8000/chat', {
-    token: token.value,
-    message: messageText,
-  });
+  try {
+    const res = await axios.post('http://localhost:8000/chat', {
+      token: token.value,
+      message: messageText,
+    });
 
-  const answer = res.data.data.message;
-  // console.log(answer)
+    const data = res.data.data;
 
-  addMessage(answer, false)
+    // 1. 응답에 message가 있는 경우 → 일반 대화 응답
+    if (data.message) {
+      addMessage(data.message, false);
+    } else if (data.recommend_result) {
+      // 2. 추천 결과만 있는 경우 → 마지막 응답 처리
+      addMessage('취미 추천을 드릴게요!', false);
+    } else {
+      // 3. 예상하지 못한 응답
+      addMessage('알 수 없는 응답입니다.', false);
+    }
 
-  // 완료 여부 확인 (예: 마지막 메시지인 경우 showRecommendations 호출)
-  if (answer.includes('추천을 드릴게요') || answer.includes('완료')) {
-    isComplete.value = true;
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    emit('showRecommendations');
-  }
+    // 4. 완료 여부는 message 있는 경우에만 판단, 아니면 recommend_result로 판단
+    const backendIsComplete = data.isComplete || !!data.recommend_result;
 
-} catch (error) {
-  addMessage('서버 오류가 발생했습니다. 다시 시도해주세요.', false);
-  console.error(error);
-} finally {
-  waitingForAI.value = false;
-  isTyping.value = false;
+    if (backendIsComplete) {
+      isComplete.value = true;
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      emit('showRecommendations');
+    }
 
-  await nextTick();
-  if (chatInputRef.value && !isComplete.value) {
-    chatInputRef.value.focus();
-  }
-}
+  } catch (error) {
+    addMessage('서버 오류가 발생했습니다. 다시 시도해주세요.', false);
+    console.error(error);
+  } finally {
+    waitingForAI.value = false;
+    isTyping.value = false;
 
-
-  currentQuestionIndex.value++;
-
-  if (currentQuestionIndex.value < chatResponses.length) {
-    // 다음 질문
-    const nextQuestion = chatResponses[currentQuestionIndex.value];
-    addMessage(nextQuestion.question, false);
-  } else {
-    // 모든 질문 완료
-    addMessage(finalMessage, false);
-    isComplete.value = true;
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    emit('showRecommendations');
-  }
-
-  // AI 답변 후 입력 필드에 자동으로 포커스
-  await nextTick();
-  if (chatInputRef.value && !isComplete.value) { // 대화가 완료되지 않았을 때만 포커스
-    chatInputRef.value.focus();
+    await nextTick();
+    if (chatInputRef.value && !isComplete.value) {
+      chatInputRef.value.focus();
+    }
   }
 };
 
-onMounted(async () => {
+
+const initializeChat = async () => {
   try {
     const res = await axios.get('http://localhost:8000/generate-token');
     token.value = res.data.data.token;
 
-    // 첫 질문 표시
-    const firstQuestion = chatResponses[0];
-    addMessage(firstQuestion.question, false);
-    // console.log(token.value)
 
-    await nextTick(); // 초기 메시지 로드 후 포커스 설정
+    addMessage('안녕하세요!', false);
+
+    await nextTick();
     if (chatInputRef.value) {
       chatInputRef.value.focus();
     }
   } catch (error) {
-    console.error("토큰 생성 실패:", error);
+    console.error("초기화 실패:", error);
     addMessage('서버 오류로 대화를 시작할 수 없습니다.', false);
   }
+};
+
+onMounted(() => {
+  initializeChat();
 });
 </script>
 
@@ -258,19 +247,19 @@ onMounted(async () => {
 }
 
 .message-wrapper {
-  margin-bottom: 1.5rem; /* 메시지 버블과 시간 사이의 간격 확보 */
+  margin-bottom: 1.5rem;
   display: flex;
-  align-items: flex-end; /* 메시지 버블과 시간을 하단 정렬 */
-  gap: 0.5rem; /* 메시지 버블과 시간 사이의 간격 */
+  align-items: flex-end;
+  gap: 0.5rem;
 }
 
 .user-message {
-  flex-direction: row-reverse; /* 사용자 메시지일 경우 순서 반대로 (말풍선 오른쪽, 시간 왼쪽) */
-  justify-content: flex-start; /* flex-end 대신 flex-start를 사용하여 전체 묶음이 오른쪽으로 가도록 함 */
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 .ai-message {
-  flex-direction: row; /* AI 메시지일 경우 순서대로 (말풍선 왼쪽, 시간 오른쪽) */
+  flex-direction: row;
   justify-content: flex-start;
 }
 
@@ -303,18 +292,17 @@ onMounted(async () => {
 .message-time {
   font-size: 0.75rem;
   opacity: 0.7;
-  min-width: 20px; /* 시간 텍스트가 잘리지 않도록 최소 너비 지정 */
-  color : white
+  min-width: 20px;
+  color: white;
 }
 
 .user-message .message-time {
-  text-align: left; /* 사용자 메시지의 시간은 왼쪽에 정렬 */
+  text-align: left;
 }
 
 .ai-message .message-time {
-  text-align: right; /* AI 메시지의 시간은 오른쪽에 정렬 */
+  text-align: right;
 }
-
 
 .typing-indicator {
   position: absolute;
@@ -396,7 +384,6 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
-
 .send-button {
   width: 50px;
   height: 50px;
@@ -413,9 +400,9 @@ onMounted(async () => {
 }
 
 .send-button svg {
-  width: 22px !important; /* 원하는 크기로 설정 */
-  height: 22px !important;/* 원하는 크기로 설정 */
-  display: block; /* SVG가 블록 레벨 요소처럼 동작하도록 하여 레이아웃 문제 방지 */
+  width: 22px !important;
+  height: 22px !important;
+  display: block;
   flex-shrink: 0;
 }
 
