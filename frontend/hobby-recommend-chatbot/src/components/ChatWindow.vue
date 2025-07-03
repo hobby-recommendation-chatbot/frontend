@@ -66,13 +66,13 @@
 
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue';
-import type { Message } from '../types';
+import type { Hobby, Message } from '../types';
 import axios from 'axios'
 
 const token = ref('');
 
 const emit = defineEmits<{
-  showRecommendations: []
+  showRecommendations: [hobbies:Hobby[]]
 }>();
 
 const messages = ref<Message[]>([]);
@@ -127,18 +127,19 @@ const sendMessage = async () => {
   isTyping.value = true;
 
   try {
-    const res = await axios.post('http://localhost:8000/chat', {
+    const res = await axios.post('https://backend-ssafy-9057.fly.dev/chat', {
       token: token.value,
       message: messageText,
     });
 
     const data = res.data.data;
-
+    console.log(res)
     // 1. 응답에 message가 있는 경우 → 일반 대화 응답
     if (data.message) {
       addMessage(data.message, false);
     } else if (data.recommend_result) {
       // 2. 추천 결과만 있는 경우 → 마지막 응답 처리
+      addMessage('이전까지의 질문을 통해 맞춤 취미를 찾았어요!', false)
       addMessage('취미 추천을 드릴게요!', false);
     } else {
       // 3. 예상하지 못한 응답
@@ -147,11 +148,14 @@ const sendMessage = async () => {
 
     // 4. 완료 여부는 message 있는 경우에만 판단, 아니면 recommend_result로 판단
     const backendIsComplete = data.isComplete || !!data.recommend_result;
+    console.log(data.isComplete)
+    console.log(data)
 
     if (backendIsComplete) {
       isComplete.value = true;
+
       await new Promise(resolve => setTimeout(resolve, 2000));
-      emit('showRecommendations');
+      emit('showRecommendations', data.recommend_result);
     }
 
   } catch (error) {
@@ -171,7 +175,8 @@ const sendMessage = async () => {
 
 const initializeChat = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/generate-token');
+    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token',
+    );
     token.value = res.data.data.token;
 
 

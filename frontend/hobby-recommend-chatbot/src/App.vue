@@ -8,7 +8,10 @@ import type { AppState, Hobby } from './types';
 const currentState = ref<AppState>('chat');
 const selectedHobby = ref<Hobby | null>(null);
 
-const showRecommendations = () => {
+const hobbyList = ref<Hobby[]>([]);
+
+const showRecommendations = (recommendations: Hobby[]) => {
+  hobbyList.value = recommendations;
   currentState.value = 'recommendations';
 };
 
@@ -35,6 +38,7 @@ const goBackToRecommendations = () => {
     
     <RecommendationModal
       v-if="currentState === 'recommendations'"
+      :hobbies="hobbyList"
       @close="closeRecommendations"
       @select-hobby="selectHobby"
     />
