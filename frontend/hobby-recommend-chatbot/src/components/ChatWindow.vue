@@ -134,10 +134,8 @@ const sendMessage = async () => {
     const res = await axios.post('https://backend-ssafy-9057.fly.dev/chat', {
       token: token.value,
       message: messageText,
-      id: "ssafy", pw: "1234",
-      withCredentials: true,    // ⭐ 쿠키·인증 헤더 포함
     });
-    
+
     const data = res.data.data;
 
     // 1. 응답에 message가 있는 경우 → 일반 대화 응답
@@ -257,7 +255,7 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #97a9cd, #a55bea);
+  background: linear-gradient(135deg, #8da8de, #d8afff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -336,7 +334,7 @@ onUnmounted(() => {
   font-size: 0.75rem;
   opacity: 0.7;
   min-width: 20px;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .user-message .message-time {
