@@ -127,7 +127,7 @@ const sendMessage = async () => {
   isTyping.value = true;
 
   try {
-    const res = await axios.post('http://localhost:8000/chat', {
+    const res = await axios.post('https://backend-ssafy-9057.fly.dev/chat', {
       token: token.value,
       message: messageText,
     });
@@ -171,7 +171,7 @@ const sendMessage = async () => {
 
 const initializeChat = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/generate-token');
+    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token');
     token.value = res.data.data.token;
 
 
