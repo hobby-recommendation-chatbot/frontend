@@ -39,7 +39,7 @@ const materialsList = computed(() => {
   // 문자열인 경우 쉼표나 줄바꿈으로 분리
   if (typeof props.hobby.equipments === 'string') {
     return props.hobby.equipments
-      .split(/[,\n]/)
+      .split(/[,\n|]/)
       .map(item => item.trim())
       .filter(item => item.length > 0);
   }

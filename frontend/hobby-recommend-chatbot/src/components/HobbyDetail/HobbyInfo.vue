@@ -15,13 +15,13 @@
       <!-- 기본 설명 섹션 -->
       <div class="description-card" v-if="hobby.desc">
         <h3>📖 기본 설명</h3>
-        <p>{{ hobby.desc }}</p>
+        <div class="formatted-text" v-html="formattedDesc"></div>
       </div>
       
       <!-- 상세 설명 섹션 -->
       <div class="description-card" v-if="hobby.detail">
         <h3>📋 상세 정보</h3>
-        <p>{{ hobby.detail }}</p>
+        <div class="formatted-text" v-html="formattedDetail"></div>
       </div>
       
       <!-- 설명이 없는 경우 -->
@@ -34,11 +34,36 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Hobby } from '../../types';
 
-defineProps<{
+const props = defineProps<{
   hobby: Hobby;
 }>();
+
+// 텍스트를 HTML로 포맷팅하는 함수
+const formatText = (text: string): string => {
+  if (!text) return '';
+  
+  
+  const formatted = text
+    // 줄바꿈을 <br>로 변경
+    .replace(/\\n/g, '<br>')  
+    .replace(/\n/g, '<br>')
+    // 숫자로 시작하는 목록을 강조
+    .replace(/^(\d+\.\s+)(.+)$/gm, '<strong>$1</strong>$2')
+    .replace(/(<br>){3,}/g, '<br><br>');
+
+  return formatted;
+};
+
+const formattedDesc = computed(() => {
+  return props.hobby.desc ? formatText(props.hobby.desc) : '';
+});
+
+const formattedDetail = computed(() => {
+  return props.hobby.detail ? formatText(props.hobby.detail) : '';
+});
 </script>
 
 <style scoped>
