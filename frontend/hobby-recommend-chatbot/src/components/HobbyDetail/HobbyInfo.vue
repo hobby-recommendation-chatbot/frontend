@@ -8,7 +8,6 @@
       <img v-else :src="hobby.image_url" :alt="hobby.name" />
       <div class="image-overlay">
         <h2>{{ hobby.name }}</h2>
-        <span class="eng-name" v-if="hobby.eng_name">({{ hobby.eng_name }})</span>
       </div>
     </div>
     

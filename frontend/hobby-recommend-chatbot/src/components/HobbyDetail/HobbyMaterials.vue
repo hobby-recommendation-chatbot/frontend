@@ -20,7 +20,6 @@
     <div class="no-materials" v-else>
       <div class="no-materials-icon">📦</div>
       <p>준비물 정보가 제공되지 않았습니다.</p>
-      <p class="sub-text">일반적으로 이 취미는 특별한 준비물이 필요하지 않거나, 가정에서 쉽게 구할 수 있는 도구들로 시작할 수 있습니다.</p>
     </div>
   </div>
 </template>

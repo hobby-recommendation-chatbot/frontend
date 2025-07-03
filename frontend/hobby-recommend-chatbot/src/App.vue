@@ -19,9 +19,21 @@ const closeRecommendations = () => {
   currentState.value = 'chat';
 };
 
-const selectHobby = (hobby: Hobby) => {
+const selectHobby = async (hobby: Hobby) => {
   selectedHobby.value = hobby;
   currentState.value = 'detail';
+  try {
+    const response = await fetch(`https://backend-ssafy-9057.fly.dev/recommend-hobby/${encodeURIComponent(hobby.name)}`);
+    const data = await response.json();
+
+    selectedHobby.value = {
+        ...hobby,
+        ...data,
+    }
+    } catch (error) {
+        console.error('❌ 취미 추가 정보 불러오기 실패:', error);
+    }
+
 };
 
 const goBackToRecommendations = () => {

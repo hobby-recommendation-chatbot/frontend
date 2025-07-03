@@ -32,7 +32,6 @@
           <div class="card-content">
             <div class="card-header">
               <h3>{{ hobby.name }}</h3>
-              <span v-if="hobby.eng_name" class="eng-name">({{ hobby.eng_name }})</span>
             </div>
             
             <!-- 설명 우선순위: desc > detail > 기본 메시지 -->
