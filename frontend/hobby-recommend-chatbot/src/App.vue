@@ -7,11 +7,17 @@ import type { AppState, Hobby } from './types';
 
 const currentState = ref<AppState>('chat');
 const selectedHobby = ref<Hobby | null>(null);
+const recommendedHobbies = ref<Hobby[]>([]); // 추천 취미 데이터 저장
 
+<<<<<<< HEAD
 const hobbyList = ref<Hobby[]>([]);
 
 const showRecommendations = (recommendations: Hobby[]) => {
   hobbyList.value = recommendations;
+=======
+const showRecommendations = (hobbies: Hobby[]) => {
+  recommendedHobbies.value = hobbies; // 취미 데이터 저장
+>>>>>>> e295230e257f6b04f6871b82991309f5f857d7a6
   currentState.value = 'recommendations';
 };
 
@@ -38,7 +44,11 @@ const goBackToRecommendations = () => {
     
     <RecommendationModal
       v-if="currentState === 'recommendations'"
+<<<<<<< HEAD
       :hobbies="hobbyList"
+=======
+      :hobbies="recommendedHobbies"
+>>>>>>> e295230e257f6b04f6871b82991309f5f857d7a6
       @close="closeRecommendations"
       @select-hobby="selectHobby"
     />
