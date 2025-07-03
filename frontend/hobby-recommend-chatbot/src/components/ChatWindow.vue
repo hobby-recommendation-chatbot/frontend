@@ -197,14 +197,12 @@ const initializeChat = async () => {
 // 동적 높이 설정 함수
 const setDynamicHeight = () => {
   if (chatContainerRef.value) {
-    // visualViewport.height를 사용하여 키보드가 올라왔을 때 가용 공간을 정확히 반영
     if (window.visualViewport) {
       chatContainerRef.value.style.height = `${window.visualViewport.height}px`;
     } else {
-      // visualViewport를 지원하지 않는 경우 window.innerHeight 사용 (덜 정확할 수 있음)
       chatContainerRef.value.style.height = `${window.innerHeight}px`;
     }
-    scrollToBottom(); // 높이 변경 시 스크롤 위치 재조정
+    scrollToBottom(); // 높이 변경 시 스크롤 위치 재조정 -> 이 부분이 중요!
   }
 };
 
@@ -285,6 +283,7 @@ onUnmounted(() => {
   overflow-y: auto;
   padding: 1rem;
   /* padding-bottom: 120px; */
+  -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
 }
 
 .message-wrapper {
