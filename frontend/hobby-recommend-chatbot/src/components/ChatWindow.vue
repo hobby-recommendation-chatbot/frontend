@@ -248,6 +248,7 @@ onUnmounted(() => {
 .chat-header {
   display: flex;
   align-items: center;
+  position: relative;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -268,6 +269,13 @@ onUnmounted(() => {
 
 .avatar-icon {
   font-size: 1.5rem;
+}
+
+.header-info {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
 }
 
 .header-info h2 {
@@ -332,6 +340,7 @@ onUnmounted(() => {
 .message-content {
   line-height: 1.5;
   white-space: pre-line;
+  text-align: left;
 }
 
 .message-time {
