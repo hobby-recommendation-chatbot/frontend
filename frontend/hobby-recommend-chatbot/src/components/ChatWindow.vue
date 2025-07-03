@@ -50,13 +50,13 @@
           ref="chatInputRef"
         />
         <button 
-  @click="sendMessage"
-  :disabled="!userInput.trim() 
-               || isTyping 
-               || waitingForAI 
-               || !token"       
-  class="send-button"
->
+          @click="sendMessage"
+          :disabled="!userInput.trim()
+                      || isTyping
+                      || waitingForAI
+                      || !token"
+          class="send-button"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -68,13 +68,8 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, onUnmounted } from 'vue';
 import type { Hobby, Message } from '../types';
-=======
-import { ref, nextTick, onMounted, onUnmounted  } from 'vue';
-import type { Message } from '../types';
->>>>>>> e295230e257f6b04f6871b82991309f5f857d7a6
 import axios from 'axios'
 
 const token = ref('');
@@ -139,10 +134,8 @@ const sendMessage = async () => {
     const res = await axios.post('https://backend-ssafy-9057.fly.dev/chat', {
       token: token.value,
       message: messageText,
-      id: "ssafy", pw: "1234",
-      withCredentials: true,    // ⭐ 쿠키·인증 헤더 포함
     });
-    
+
     const data = res.data.data;
     console.log(res)
     // 1. 응답에 message가 있는 경우 → 일반 대화 응답
@@ -151,6 +144,7 @@ const sendMessage = async () => {
     } else if (data.recommend_result) {
       // 2. 추천 결과만 있는 경우 → 마지막 응답 처리
       addMessage('이전까지의 질문을 통해 맞춤 취미를 찾았어요!', false)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       addMessage('취미 추천을 드릴게요!', false);
     } else {
       // 3. 예상하지 못한 응답
@@ -188,12 +182,7 @@ const sendMessage = async () => {
 
 const initializeChat = async () => {
   try {
-<<<<<<< HEAD
-    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token',
-    );
-=======
-    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token');
->>>>>>> e295230e257f6b04f6871b82991309f5f857d7a6
+    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token',);
     token.value = res.data.data.token;
 
 
@@ -224,10 +213,8 @@ const setDynamicHeight = () => {
   }
 };
 
-
 onMounted(() => {
   initializeChat();
-
   // 초기 로드 시 높이 설정
   setDynamicHeight();
 
@@ -253,9 +240,9 @@ onUnmounted(() => {
   flex-direction: column;
   /* height: 100dvh; */
   min-height: 100vh; /* 전체 화면 높이 기본 보장 */
+  height: 100vh;
   background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
-
 }
 
 .chat-header {
@@ -363,7 +350,7 @@ onUnmounted(() => {
 
 .typing-indicator {
   position: absolute;
-  bottom: 90px;
+  bottom: 98px;
   left: 1rem;
   right: 1rem;
   padding: 1rem;
