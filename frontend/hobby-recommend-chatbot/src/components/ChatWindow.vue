@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" ref="chatContainerRef">
     <div class="chat-header">
       <div class="avatar">
         <div class="avatar-icon">🤖</div>
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, onUnmounted  } from 'vue';
 import type { Message } from '../types';
 import axios from 'axios'
 
@@ -85,6 +85,7 @@ const isTyping = ref(false);
 const waitingForAI = ref(false);
 const isComplete = ref(false);
 const chatInputRef = ref<HTMLInputElement | null>(null);
+const chatContainerRef = ref<HTMLElement | null>(null);
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -168,6 +169,8 @@ const sendMessage = async () => {
     if (chatInputRef.value && !isComplete.value) {
       chatInputRef.value.focus();
     }
+
+    scrollToBottom();
   }
 };
 
@@ -184,22 +187,56 @@ const initializeChat = async () => {
     if (chatInputRef.value) {
       chatInputRef.value.focus();
     }
+    scrollToBottom();
   } catch (error) {
     console.error("초기화 실패:", error);
     addMessage('서버 오류로 대화를 시작할 수 없습니다.', false);
   }
 };
 
+// 동적 높이 설정 함수
+const setDynamicHeight = () => {
+  if (chatContainerRef.value) {
+    // visualViewport.height를 사용하여 키보드가 올라왔을 때 가용 공간을 정확히 반영
+    if (window.visualViewport) {
+      chatContainerRef.value.style.height = `${window.visualViewport.height}px`;
+    } else {
+      // visualViewport를 지원하지 않는 경우 window.innerHeight 사용 (덜 정확할 수 있음)
+      chatContainerRef.value.style.height = `${window.innerHeight}px`;
+    }
+    scrollToBottom(); // 높이 변경 시 스크롤 위치 재조정
+  }
+};
+
+
 onMounted(() => {
   initializeChat();
+
+  // 초기 로드 시 높이 설정
+  setDynamicHeight();
+
+  window.addEventListener('resize', setDynamicHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setDynamicHeight);
+  }
 });
+
+onUnmounted(() => {
+  // 컴포넌트 언마운트 시 이벤트 리스너 제거
+  window.removeEventListener('resize', setDynamicHeight);
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', setDynamicHeight);
+  }
+});
+
 </script>
 
 <style scoped>
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  /* height: 100dvh; */
+  min-height: 100vh; /* 전체 화면 높이 기본 보장 */
   background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
 
@@ -247,7 +284,7 @@ onMounted(() => {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  padding-bottom: 120px;
+  /* padding-bottom: 120px; */
 }
 
 .message-wrapper {
