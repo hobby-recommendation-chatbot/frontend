@@ -19,7 +19,7 @@
             <!-- 이미지가 있는 경우 -->
             <img 
               v-if="hobby.image_url" 
-              :src="hobby.image_url" 
+              :src="getImageUrl(hobby.image_url)" 
               :alt="hobby.name" 
             />
             <!-- 이미지가 없는 경우 기본 아이콘 -->
@@ -72,6 +72,12 @@ const emit = defineEmits<{
   close: [];
   selectHobby: [hobby: Hobby];
 }>();
+
+const BASE_URL = 'https://backend-ssafy-9057.fly.dev/';
+
+function getImageUrl(imageUrl: string) {
+  return BASE_URL + imageUrl;
+}
 
 const scrollContainer = ref<HTMLElement>();
 const cardRefs = ref<HTMLElement[]>([]);

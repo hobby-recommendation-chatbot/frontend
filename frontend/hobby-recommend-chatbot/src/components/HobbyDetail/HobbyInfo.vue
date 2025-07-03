@@ -5,7 +5,7 @@
       <div class="image-placeholder" v-if="!hobby.image_url">
         <div class="hobby-icon">🎯</div>
       </div>
-      <img v-else :src="hobby.image_url" :alt="hobby.name" />
+      <img v-else :src="getImageUrl(hobby.image_url)" :alt="hobby.name" />
       <div class="image-overlay">
         <h2>{{ hobby.name }}</h2>
       </div>
@@ -40,6 +40,12 @@ import type { Hobby } from '../../types';
 const props = defineProps<{
   hobby: Hobby;
 }>();
+
+const BASE_URL = 'https://backend-ssafy-9057.fly.dev/';
+
+function getImageUrl(imageUrl: string) {
+  return BASE_URL + imageUrl;
+}
 
 // 텍스트를 HTML로 포맷팅하는 함수
 const formatText = (text: string): string => {
