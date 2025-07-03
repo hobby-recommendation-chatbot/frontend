@@ -196,9 +196,10 @@ onMounted(() => {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
+
 }
 
 .chat-header {
@@ -306,7 +307,7 @@ onMounted(() => {
 
 .typing-indicator {
   position: absolute;
-  bottom: 98px;
+  bottom: 90px;
   left: 1rem;
   right: 1rem;
   padding: 1rem;

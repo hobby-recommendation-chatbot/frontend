@@ -15,7 +15,7 @@
   "devDependencies": {
     "@parcel/transformer-vue": "^2.15.4",
     "buffer": "^6.0.3",
-    "parcel": "^2.13.2",
+    "parcel": "^2.15.4",
     "typescript": "^5.5.3"
   }
 }
