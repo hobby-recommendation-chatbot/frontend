@@ -43,6 +43,7 @@
           v-model="userInput"
           @keypress.enter="sendMessage"
           @input="handleInput"
+          @focus="handleInputFocus"
           type="text"
           placeholder="답변을 입력해주세요..."
           class="chat-input"
@@ -68,14 +69,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted } from 'vue';
-import type { Hobby, Message } from '../types';
+import { ref, nextTick, onMounted, onUnmounted  } from 'vue';
+import type { Message } from '../types';
 import axios from 'axios'
 
 const token = ref('');
 
 const emit = defineEmits<{
-  showRecommendations: [hobbies:Hobby[]]
+  showRecommendations: []
 }>();
 
 const messages = ref<Message[]>([]);
@@ -86,6 +87,7 @@ const waitingForAI = ref(false);
 const isComplete = ref(false);
 const chatInputRef = ref<HTMLInputElement | null>(null);
 const chatContainerRef = ref<HTMLElement | null>(null);
+const chatInputContainerRef = ref<HTMLElement | null>(null);
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -118,15 +120,13 @@ const handleInput = () => {
 };
 
 const sendMessage = async () => {
-  if (!userInput.value.trim() || isTyping.value || waitingForAI.value) return;
+  if (!userInput.value.trim() || isTyping.value || waitingForAI.value || !token.value) return;
 
   const messageText = userInput.value.trim();
   userInput.value = '';
 
-  // 사용자 메시지 추가
   addMessage(messageText, true);
 
-  // AI 타이핑 표시
   waitingForAI.value = true;
   isTyping.value = true;
 
@@ -137,30 +137,21 @@ const sendMessage = async () => {
     });
 
     const data = res.data.data;
-    console.log(res)
-    // 1. 응답에 message가 있는 경우 → 일반 대화 응답
+
     if (data.message) {
       addMessage(data.message, false);
     } else if (data.recommend_result) {
-      // 2. 추천 결과만 있는 경우 → 마지막 응답 처리
-      addMessage('이전까지의 질문을 통해 맞춤 취미를 찾았어요!', false)
-      await new Promise(resolve => setTimeout(resolve, 1000));
       addMessage('취미 추천을 드릴게요!', false);
     } else {
-      // 3. 예상하지 못한 응답
       addMessage('알 수 없는 응답입니다.', false);
     }
 
-    // 4. 완료 여부는 message 있는 경우에만 판단, 아니면 recommend_result로 판단
     const backendIsComplete = data.isComplete || !!data.recommend_result;
-    console.log(data.isComplete)
-    console.log(data)
 
     if (backendIsComplete) {
       isComplete.value = true;
-
       await new Promise(resolve => setTimeout(resolve, 2000));
-      emit('showRecommendations', data.recommend_result);
+      emit('showRecommendations');
     }
 
   } catch (error) {
@@ -174,17 +165,14 @@ const sendMessage = async () => {
     if (chatInputRef.value && !isComplete.value) {
       chatInputRef.value.focus();
     }
-
     scrollToBottom();
   }
 };
 
-
 const initializeChat = async () => {
   try {
-    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token',);
+    const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token');
     token.value = res.data.data.token;
-
 
     addMessage('안녕하세요!', false);
 
@@ -199,24 +187,28 @@ const initializeChat = async () => {
   }
 };
 
-// 동적 높이 설정 함수
-const setDynamicHeight = () => {
+// 동적 높이 설정 함수 (padding-bottom과 bottom은 CSS로 관리)
+const setDynamicHeight = async () => {
+  await nextTick();
   if (chatContainerRef.value) {
-
+    let viewportHeight = 0;
     if (window.visualViewport) {
-      chatContainerRef.value.style.height = `${window.visualViewport.height}px`;
+      viewportHeight = window.visualViewport.height;
     } else {
-        
-      chatContainerRef.value.style.height = `${window.innerHeight}px`;
+      viewportHeight = window.innerHeight;
     }
-    scrollToBottom(); // 높이 변경 시 스크롤 위치 재조정 -> 이 부분이 중요!
+    chatContainerRef.value.style.height = `${viewportHeight}px`;
+    // 여기서 messagesContainer.value.style.paddingBottom 설정은 제거
+    // typingIndicatorElement.style.bottom 설정도 제거
+    scrollToBottom();
   }
 };
 
+
 onMounted(() => {
   initializeChat();
-  // 초기 로드 시 높이 설정
-  setDynamicHeight();
+
+  setDynamicHeight(); // 초기 로드 시 높이 설정
 
   window.addEventListener('resize', setDynamicHeight);
   if (window.visualViewport) {
@@ -225,24 +217,23 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
   window.removeEventListener('resize', setDynamicHeight);
   if (window.visualViewport) {
     window.visualViewport.removeEventListener('resize', setDynamicHeight);
   }
 });
-
 </script>
 
 <style scoped>
 .chat-container {
   display: flex;
   flex-direction: column;
-  /* height: 100dvh; */
-  /* min-height: 100vh; */
+  /* height는 JavaScript에서 동적으로 설정하므로 여기서는 제거하거나 100vh로 둡니다. */
+  /* min-height: 100vh; /* 이 줄은 여전히 제거되어야 합니다. */
   background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
 }
+
 
 .chat-header {
   display: flex;
@@ -286,8 +277,8 @@ onUnmounted(() => {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  /* padding-bottom: 120px; */
-  -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
+  padding-bottom: 90px; /* 입력창 높이(약 76px) + 여유 공간(약 14px) */
+  -webkit-overflow-scrolling: touch;
 }
 
 .message-wrapper {
@@ -350,7 +341,7 @@ onUnmounted(() => {
 
 .typing-indicator {
   position: absolute;
-  bottom: 98px;
+  bottom: 90px; /* chat-messages의 padding-bottom과 동일하게 설정하여 입력창 위에 위치 */
   left: 1rem;
   right: 1rem;
   padding: 1rem;
@@ -389,7 +380,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
+  padding: 1rem; /* 이 패딩이 입력창의 실제 높이에 영향을 줍니다. */
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -411,6 +402,9 @@ onUnmounted(() => {
   font-size: 0.875rem;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  /* iOS 키보드 대응: 확대 방지 및 스타일 개선 */
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .chat-input::placeholder {
@@ -461,6 +455,25 @@ onUnmounted(() => {
   transform: none;
 }
 
+/* iOS 전용 스타일 */
+@supports (-webkit-touch-callout: none) {
+  .chat-container {
+    /* iOS Safari에서 100vh 대신 사용 */
+    min-height: -webkit-fill-available;
+  }
+  
+  .chat-messages {
+    /* iOS에서 rubber band 효과 제거 */
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .chat-input {
+    /* iOS에서 입력창 확대 방지 */
+    font-size: 16px;
+  }
+}
+
 @keyframes messageSlide {
   from {
     opacity: 0;
@@ -496,8 +509,8 @@ onUnmounted(() => {
     padding: 0.75rem;
   }
   
-  .chat-messages {
-    padding-bottom: 100px;
+.chat-messages {
+    padding-bottom: 90px; /* 모바일에서도 동일하게 적용 */
   }
 }
 </style>
