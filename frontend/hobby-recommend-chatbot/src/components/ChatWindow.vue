@@ -236,7 +236,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   /* height: 100dvh; */
-  min-height: 100vh; /* 전체 화면 높이 기본 보장 */
+  /* min-height: 100vh; */
   background: linear-gradient(135deg, #929ddc 0%, #764ba2 100%);
   position: relative;
 
