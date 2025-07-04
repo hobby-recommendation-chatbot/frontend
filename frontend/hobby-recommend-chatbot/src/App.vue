@@ -3,10 +3,12 @@ import { ref } from 'vue';
 import ChatWindow from './components/ChatWindow.vue';
 import RecommendationModal from './components/RecommendationModal.vue';
 import HobbyDetail from './components/HobbyDetail/HobbyDetail.vue';
+import LoadingScreen from './components/LoadingScreen.vue';
 import type { AppState, Hobby } from './types';
 
 const currentState = ref<AppState>('chat');
-const selectedHobby = ref<Hobby | null>(null)
+const selectedHobby = ref<Hobby | null>(null);
+const isLoading = ref(false);
 
 const hobbyList = ref<Hobby[]>([]);
 
@@ -21,19 +23,22 @@ const closeRecommendations = () => {
 
 const selectHobby = async (hobby: Hobby) => {
   selectedHobby.value = hobby;
+  isLoading.value = true;
   currentState.value = 'detail';
+  
   try {
     const response = await fetch(`https://backend-ssafy-9057.fly.dev/recommend-hobby/${encodeURIComponent(hobby.name)}`);
     const data = await response.json();
-
+    
     selectedHobby.value = {
-        ...hobby,
-        ...data,
-    }
-    } catch (error) {
-        console.error('❌ 취미 추가 정보 불러오기 실패:', error);
-    }
-
+      ...hobby,
+      ...data,
+    };
+  } catch (error) {
+    console.error('❌ 취미 추가 정보 불러오기 실패:', error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const goBackToRecommendations = () => {
@@ -50,13 +55,20 @@ const goBackToRecommendations = () => {
     
     <RecommendationModal
       v-if="currentState === 'recommendations'"
-      :hobbies=hobbyList
+      :hobbies="hobbyList"
       @close="closeRecommendations"
       @select-hobby="selectHobby"
     />
     
+    <!-- 로딩 중일 때 로딩 화면 표시 -->
+    <LoadingScreen
+      v-if="currentState === 'detail' && isLoading"
+      :hobby-name="selectedHobby?.name"
+    />
+    
+    <!-- 로딩 완료 후-->
     <HobbyDetail
-      v-if="currentState === 'detail' && selectedHobby"
+      v-if="currentState === 'detail' && !isLoading && selectedHobby"
       :hobby="selectedHobby"
       @back="goBackToRecommendations"
     />
@@ -91,7 +103,6 @@ body {
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Scrollbar 스타일링 */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -109,20 +120,17 @@ body {
   background: rgba(139, 92, 246, 0.5);
 }
 
-/* 전역 버튼 스타일 */
 button {
   font-family: inherit;
   font-size: inherit;
 }
 
-/* 반응형 텍스트 */
 @media (max-width: 768px) {
   html {
     font-size: 14px;
   }
 }
 
-/* 접근성 개선 */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -131,7 +139,6 @@ button {
   }
 }
 
-/* 포커스 스타일 */
 button:focus-visible {
   outline: 2px solid #8B5CF6;
   outline-offset: 2px;
