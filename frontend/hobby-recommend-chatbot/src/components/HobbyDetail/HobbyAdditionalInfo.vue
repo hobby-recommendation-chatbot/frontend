@@ -8,18 +8,24 @@
     <div class="additional-content">
       <div class="content-card">
         <h4>🎯 시작하기 전에</h4>
-        <p>{{ hobby.additional_info || '추가 정보가 제공되지 않았습니다.' }}</p>
+        <div v-html="renderedMarkdown" class="markdown-body" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { marked } from 'marked';
+import { computed } from 'vue';
 import type { Hobby } from '../../types';
 
-defineProps<{
+const props = defineProps<{
   hobby: Hobby;
-}>();
+}>()
+
+const renderedMarkdown = computed(() =>
+  marked.parse(props.hobby.additional_info || '추가 정보가 제공되지 않았습니다.') as string
+)
 </script>
 
 <style scoped>
@@ -70,6 +76,10 @@ defineProps<{
   margin: 0;
   color: #4b5563;
   line-height: 1.6;
+}
+
+.markdown-body {
+  text-align: left;
 }
 
 @keyframes fadeIn {
