@@ -35,7 +35,7 @@ const selectHobby = async (hobby: Hobby) => {
       ...data,
     };
   } catch (error) {
-    console.error('❌ 취미 추가 정보 불러오기 실패:', error);
+    console.error('취미 추가 정보 불러오기 실패:', error);
   } finally {
     isLoading.value = false;
   }

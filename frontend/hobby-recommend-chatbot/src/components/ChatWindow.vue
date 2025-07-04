@@ -184,7 +184,7 @@ const initializeChat = async () => {
     const res = await axios.get('https://backend-ssafy-9057.fly.dev/generate-token');
     token.value = res.data.data.token;
 
-    addMessage('안녕하세요!', false);
+    addMessage('안녕하세요! 저는 당신의 생활 스타일을 분석해서 잘 맞는 취미를 찾아주는 AI 챗봇이에요 🤖 가볍게 몇 가지 질문 드릴게요. 편하게 답해주세요!', false);
 
     await nextTick();
     if (chatInputRef.value) {
