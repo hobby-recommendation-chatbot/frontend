@@ -131,6 +131,12 @@ const formattedDetail = computed(() => {
   line-height: 1.6;
 }
 
+.formatted-text {
+  text-align: left;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
